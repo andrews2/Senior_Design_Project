@@ -1,4 +1,4 @@
-package com.example.iotcasinochipapp;
+package com.example.iotcasinoapp;
 
 import org.junit.Test;
 
