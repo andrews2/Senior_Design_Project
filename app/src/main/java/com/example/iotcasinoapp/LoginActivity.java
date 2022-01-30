@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ObjectInputStream;
@@ -16,8 +19,8 @@ import java.io.Serializable;
 import java.net.Socket;
 
 public class LoginActivity extends AppCompatActivity {
-    Thread Thread1 = null;
     EditText username, password;
+    TextView tv;
     Button login, signup;
     String SERVER_IP = "172.20.10.2";
     int SERVER_PORT = 1234;
@@ -37,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
         signup = findViewById(R.id.Signup);
         password = findViewById(R.id.Password);
         context = this;
+
+
 
         //set up buttons to wait for click
         login.setOnClickListener(new View.OnClickListener() {
@@ -71,13 +76,27 @@ public class LoginActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             username.setText("");
             password.setText("");
+            username.setEnabled(true);
+            password.setEnabled(true);
             signup.setClickable(true);
             login.setClickable(true);
         });
     }
+
+    public void lockInputsOnError(String e){
+        runOnUiThread(()->{
+            tv.setText(e);
+            username.setText("");
+            password.setText("");
+            username.setEnabled(false);
+            password.setEnabled(false);
+            signup.setClickable(false);
+            login.setClickable(false);
+        });
+    }
     //main thread to handle connection to server
     public void connectToServer(){
-        Thread thread = new Thread(){
+        Thread thread1 = new Thread(){
             public void run(){
                 try {
                     message.trim(); //trim username and password message to be sent
@@ -104,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-        thread.start();
+        thread1.start();
     }
 
 }

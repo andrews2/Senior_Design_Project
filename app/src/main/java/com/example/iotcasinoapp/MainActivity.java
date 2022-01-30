@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,10 +25,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
+        tv = findViewById(R.id.textView1);
         accountValue = intent.getIntExtra(accKey, 0);
 
-        //load the socket
-        s = SocketHandler.getSocket();
+        tv.setText(String.valueOf(accountValue));
+        
+
+
 
 
     }
