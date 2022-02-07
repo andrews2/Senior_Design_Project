@@ -3,8 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/button_bg.xml" value="0.1535" />
+        <entry key="app/src/main/res/drawable/cureved_corners.xml" value="0.1535" />
+        <entry key="app/src/main/res/drawable/curved_corners.xml" value="0.1535" />
+        <entry key="app/src/main/res/drawable/li_btn.xml" value="0.1535" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.24510345458984376" />
+        <entry key="app/src/main/res/layout/login_tab_fragment.xml" value="0.17798913043478262" />
+        <entry key="app/src/main/res/layout/signup_tab_fragment.xml" value="0.17798913043478262" />
       </map>
     </option>
   </component>

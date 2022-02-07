@@ -1,6 +1,8 @@
 package com.example.iotcasinoapp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,32 +15,38 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
+    private Retrofit retrofit;
+    private RetrofitInterface retrofitInterface;
+    private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
     EditText username, password;
-    TextView tv;
     Button login, signup;
-    String SERVER_IP = "172.20.10.2";
-    int SERVER_PORT = 1234;
-    String message;
-    Socket s;
-    ObjectOutputStream oos;
-    ObjectInputStream ois;
     Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        retrofitInterface = retrofit.create(RetrofitInterface.class);
         username = findViewById(R.id.Username);
         password = findViewById(R.id.Password);
         login = findViewById(R.id.Login);
         signup = findViewById(R.id.Signup);
-        password = findViewById(R.id.Password);
         context = this;
 
 
@@ -47,10 +55,31 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                message = "LI " + username.getText().toString() + " " + password.getText().toString();
-                signup.setClickable(false);
-                login.setClickable(false);
-                connectToServer();
+                HashMap<String, String> map = new HashMap<>();
+                map.put("name", username.getText().toString());
+                map.put("password", password.getText().toString());
+
+                Call<LoginResult> call = retrofitInterface.executeLogin(map);
+                call.enqueue(new Callback<LoginResult>() {
+                    @Override
+                    public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                        if(response.code() == 200){
+                            LoginResult result = response.body();
+                            Intent nextIntent = new Intent(LoginActivity.this, MainActivity.class);
+                            LoginActivity.this.startActivity(nextIntent);
+                        } else if(response.code() == 400){
+                            Toast.makeText(LoginActivity.this, "Incorrect Password for " + username.getText().toString(), Toast.LENGTH_LONG).show();
+                        }
+                        else if(response.code() == 404){
+                            Toast.makeText(LoginActivity.this, "Account does not exist", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<LoginResult> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 
@@ -58,72 +87,32 @@ public class LoginActivity extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                message = "SU " + username.getText().toString() + " " + password.getText().toString();
-                signup.setClickable(false);
-                login.setClickable(false);
-                connectToServer();
+                HashMap<String, String> map = new HashMap<>();
+                map.put("name", username.getText().toString());
+                map.put("password", password.getText().toString());
+
+                Call<Void> call = retrofitInterface.executeSignup(map);
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.code() == 200){
+                            Intent nextIntent = new Intent(LoginActivity.this, MainActivity.class);
+                            LoginActivity.this.startActivity(nextIntent);
+                        } else if(response.code() == 400){
+                            Toast.makeText(LoginActivity.this, "Username is already taken", Toast.LENGTH_LONG).show();
+                        } else{
+                            Toast.makeText(LoginActivity.this, String.valueOf(response.code()), Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 
 
     }
-    //sends messages to screen
-    public void showToast(final String toast){
-        runOnUiThread(() -> Toast.makeText(LoginActivity.this, toast, Toast.LENGTH_LONG).show());
-    }
-    //reset GUI objects to inital states
-    public void resetInputs(){
-        runOnUiThread(() -> {
-            username.setText("");
-            password.setText("");
-            username.setEnabled(true);
-            password.setEnabled(true);
-            signup.setClickable(true);
-            login.setClickable(true);
-        });
-    }
-
-    public void lockInputsOnError(String e){
-        runOnUiThread(()->{
-            tv.setText(e);
-            username.setText("");
-            password.setText("");
-            username.setEnabled(false);
-            password.setEnabled(false);
-            signup.setClickable(false);
-            login.setClickable(false);
-        });
-    }
-    //main thread to handle connection to server
-    public void connectToServer(){
-        Thread thread1 = new Thread(){
-            public void run(){
-                try {
-                    message.trim(); //trim username and password message to be sent
-                    // initalize server connection objects
-                    s = new Socket(SERVER_IP, SERVER_PORT);
-                    oos = new ObjectOutputStream(s.getOutputStream());
-                    oos.writeObject(message);
-                    ois = new ObjectInputStream(s.getInputStream());
-                    // get reply from server
-                    String reply = (String) ois.readObject();
-                    if (reply.equals("Login/signup Succesful")) { // check if is a succesful login
-                        int accval = (int) ois.readObject();
-                        SocketHandler.setSocket(s);
-                        Intent nextIntent = new Intent(LoginActivity.this, MainActivity.class);
-                        nextIntent.putExtra("accountValue", accval);
-                        LoginActivity.this.startActivity(nextIntent);
-                    }
-                    else{
-                        showToast(reply);
-                        resetInputs();
-                    }
-                } catch (Exception e) {
-                    showToast("Error: " + e.toString());
-                }
-            }
-        };
-        thread1.start();
-    }
-
 }
