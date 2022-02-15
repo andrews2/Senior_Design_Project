@@ -1,10 +1,9 @@
 package com.example.iotcasinoapp;
 
 public class LoginResult {
-    private int accountValue;
-
+    private String accountValue;
     public int getAccountValue() {
-        return accountValue;
+        return Integer.parseInt(accountValue);
     }
 
 }

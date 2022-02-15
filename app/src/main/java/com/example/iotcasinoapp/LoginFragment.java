@@ -53,6 +53,7 @@ public class LoginFragment extends Fragment {
                         if(response.code() == 200){
                             LoginResult result = response.body();
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
+                            nextIntent.putExtra("accountValue", result.getAccountValue());
                             getActivity().startActivity(nextIntent);
                         } else if(response.code() == 400){
                             Toast.makeText(getActivity(), "Incorrect Password for " + username.getText().toString(), Toast.LENGTH_LONG).show();
@@ -69,9 +70,6 @@ public class LoginFragment extends Fragment {
                 });
             }
         });
-
-
-
         return root;
     }
 

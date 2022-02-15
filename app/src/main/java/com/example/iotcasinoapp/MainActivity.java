@@ -12,9 +12,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
-    Socket s;
-    ObjectOutputStream oos;
-    ObjectInputStream ois;
     TextView tv;
     int accountValue;
     String accKey = "accountValue";

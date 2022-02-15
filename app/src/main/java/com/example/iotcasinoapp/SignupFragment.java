@@ -76,9 +76,6 @@ public class SignupFragment extends Fragment {
                 });
             }
         });
-
-
-
         return root;
     }
 
