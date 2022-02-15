@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+
 import com.google.android.material.tabs.TabLayout;
 
 
@@ -15,6 +18,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
         //find GUI objects
         tabLayout = findViewById(R.id.tab_layout);
