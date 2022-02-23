@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -59,6 +60,8 @@ public class SignupFragment extends Fragment {
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.code() == 200){
                             // successful signup attempt, start main activity
+                            AccountDataHandler.getInstance().setAccountValue(0);
+                            AccountDataHandler.getInstance().setUsername(username.getText().toString().toUpperCase());
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
                             getActivity().startActivity(nextIntent);
                         } else if(response.code() == 400){
