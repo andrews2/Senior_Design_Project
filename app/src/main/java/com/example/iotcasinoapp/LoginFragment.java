@@ -11,7 +11,12 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
+
+import javax.crypto.SecretKey;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -22,6 +27,7 @@ import retrofit2.Response;
 public class LoginFragment extends Fragment {
     EditText username, password;
     Button login;
+    String usernameToSend, passwordToSend;
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
@@ -43,8 +49,16 @@ public class LoginFragment extends Fragment {
                     return;
                 }
                 HashMap<String, String> map = new HashMap<>();
-                map.put("name", username.getText().toString().toUpperCase());
-                map.put("password", password.getText().toString());
+                //ecrypt username and password
+                try {
+                    SecretKey secret = DataEncryption.generateKey();
+                    usernameToSend = DataEncryption.encrypt(username.getText().toString().toUpperCase(), secret);
+                    passwordToSend = DataEncryption.encrypt(password.getText().toString(), secret);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                map.put("name", usernameToSend);
+                map.put("password", passwordToSend);
 
                 Call<LoginResult> call = retrofitInterface.executeLogin(map);
                 call.enqueue(new Callback<LoginResult>() {
