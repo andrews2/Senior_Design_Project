@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import java.util.HashMap;
 import java.util.Locale;
 
+import javax.crypto.SecretKey;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
@@ -23,6 +25,7 @@ import retrofit2.Response;
 public class SignupFragment extends Fragment {
     EditText username, password, confrimPassword;
     Button signup;
+    String usernameToSend, passwordToSend;
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
@@ -50,8 +53,16 @@ public class SignupFragment extends Fragment {
                 }
                 //create map object with username and password
                 HashMap<String, String> map = new HashMap<>();
-                map.put("name", username.getText().toString().toUpperCase());
-                map.put("password", password.getText().toString());
+                //ecrypt username and password
+                try {
+                    SecretKey secret = DataEncryption.generateKey();
+                    usernameToSend = DataEncryption.encrypt(username.getText().toString().toUpperCase(), secret);
+                    passwordToSend = DataEncryption.encrypt(password.getText().toString(), secret);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                map.put("name", usernameToSend);
+                map.put("password", passwordToSend);
                 //send message to server
                 Call<Void> call = retrofitInterface.executeSignup(map);
                 //wait for response
