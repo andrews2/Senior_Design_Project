@@ -85,7 +85,7 @@ public class SignupFragment extends Fragment {
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Error connecting to server. Please try again.", Toast.LENGTH_LONG).show();
                     }
                 });
             }

@@ -60,6 +60,7 @@ public class LoginFragment extends Fragment {
                 map.put("name", usernameToSend);
                 map.put("password", passwordToSend);
 
+
                 Call<LoginResult> call = retrofitInterface.executeLogin(map);
                 call.enqueue(new Callback<LoginResult>() {
                     @Override
@@ -82,7 +83,7 @@ public class LoginFragment extends Fragment {
 
                     @Override
                     public void onFailure(Call<LoginResult> call, Throwable t) {
-                        Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Error connecting to server. Please try again.", Toast.LENGTH_LONG).show();
                     }
                 });
             }

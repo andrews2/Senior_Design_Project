@@ -12,11 +12,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class SettingsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class SettingsActivity extends BaseActivity {
 
     // toolbar variables
     public DrawerLayout drawerLayout;
@@ -28,20 +29,9 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        // set variables
-        drawerLayout = findViewById(R.id.settings_activity);
-        navigationView = findViewById(R.id.nav_view);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        navigationView.bringToFront();
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.nav_open, R.string.nav_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        //set nav view on click listeners
-        navigationView.setNavigationItemSelectedListener(this);
-
+        super.onCreateDrawer();
+        FrameLayout pageContainer = (FrameLayout) findViewById(R.id.page_container);
+        getLayoutInflater().inflate(R.layout.activity_settings, pageContainer);
         //intit settings values
         usernameText = findViewById(R.id.username_text);
         accountValue = findViewById(R.id.account_value);
@@ -57,35 +47,5 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
                 startActivity(nextIntent);
             }
         });
-    }
-
-    @Override
-    public void onBackPressed(){
-        // if drawer is open close drawer
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Intent nextIntent;
-        switch (item.getItemId()){
-            case R.id.home_page:
-                nextIntent = new Intent(this, MainActivity.class);
-                startActivity(nextIntent);
-                break;
-            case R.id.scan_page:
-                nextIntent = new Intent(this,ScanChipsActivity.class);
-                startActivity(nextIntent);
-                break;
-            case R.id.settings_page:
-                break;
-        }
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
     }
 }
