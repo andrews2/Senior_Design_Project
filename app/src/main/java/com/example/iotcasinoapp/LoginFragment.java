@@ -11,6 +11,10 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -18,6 +22,7 @@ import java.util.HashMap;
 
 import javax.crypto.SecretKey;
 
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
@@ -67,9 +72,23 @@ public class LoginFragment extends Fragment {
                     public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
                         if(response.code() == 200){
                             LoginResult result = response.body();
+                            //check if we need to download history
+                            if(!(AccountDataHandler.getInstance().getHistoryVersion().equals(result.getVersion()))){
+                                File versionFile = new File(getContext().getFilesDir(), result.getUsername() + "_version.ser");
+                                File gamesFile = new File(getContext().getFilesDir(), result.getUsername() + "_games.ser");
+                                File valsFile = new File(getContext().getFilesDir(), result.getUsername() + "_vals.ser");
+                                new GetHistFiles(gamesFile, valsFile, versionFile, result.getVersion());
+                            }
+                            else{
+                                AccountDataHandler.getInstance().historyFilesUpToDate = true;
+                            }
+
+
                             // save account value in handler
                             AccountDataHandler.getInstance().setAccountValue(result.getAccountValue());
                             AccountDataHandler.getInstance().setUsername(result.getUsername());
+                            AccountDataHandler.getInstance().setHistoryVersion(result.getVersion());
+
                             //start main activity
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
                             getActivity().startActivity(nextIntent);
@@ -92,7 +111,4 @@ public class LoginFragment extends Fragment {
 
         //set listeners for enter to go to next text box
     }
-
-
-
 }
