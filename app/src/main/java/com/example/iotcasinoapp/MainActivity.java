@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,7 +27,11 @@ public class MainActivity extends BaseActivity {
     Context context;
     RecyclerAdapter recyclerAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
-    public static Thread t;
+    public Thread t;
+    File historyGames;
+    File historyVals;
+    File historyVersion;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,10 @@ public class MainActivity extends BaseActivity {
         getLayoutInflater().inflate(R.layout.activity_main, pageContainer);
         Intent intent = getIntent();
         context = this;
+        // get files
+        historyGames = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+        historyVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
+        historyVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
         // set text view to account value
         tv = findViewById(R.id.home_account_value);
         accountValue = AccountDataHandler.getInstance().getAccountValue();
@@ -50,8 +56,13 @@ public class MainActivity extends BaseActivity {
         t = new Thread(new Runnable() {
             @Override
             public void run() {
-                File historyGames = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
-                File historyVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
+                while (!AccountDataHandler.getInstance().isHistoryUpToDate()){
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 try {
                     FileInputStream fis = new FileInputStream(historyGames);
                     ObjectInputStream ois = new ObjectInputStream(fis);
@@ -67,13 +78,14 @@ public class MainActivity extends BaseActivity {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                setAdapter();
+                updateHistoryRecycler();
             }
         });
 
-        if (AccountDataHandler.getInstance().historyFilesUpToDate == true){
-            t.start();
+        if(!AccountDataHandler.getInstance().isHistoryUpToDate()){
+            new GetHistFiles(historyGames, historyVals, historyVersion, AccountDataHandler.getInstance().getHistoryVersion());
         }
+        t.start();
 
         //set up swipe refresh
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -94,6 +106,15 @@ public class MainActivity extends BaseActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(recyclerAdapter);
-        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    public void updateHistoryRecycler(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setAdapter();
+                recyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

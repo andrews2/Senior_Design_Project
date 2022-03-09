@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.File;
+
 public class SettingsActivity extends BaseActivity {
 
     // toolbar variables
@@ -24,7 +26,7 @@ public class SettingsActivity extends BaseActivity {
     Toolbar toolbar;
     NavigationView navigationView;
     TextView usernameText, accountValue;
-    Button logout;
+    Button logout, deleteFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class SettingsActivity extends BaseActivity {
         usernameText = findViewById(R.id.username_text);
         accountValue = findViewById(R.id.account_value);
         logout = findViewById(R.id.logout);
+        deleteFiles = findViewById(R.id.delete_files);
         usernameText.setText(AccountDataHandler.getInstance().getUsername());
         accountValue.setText(String.valueOf(AccountDataHandler.getInstance().getAccountValue()));
 
@@ -45,6 +48,18 @@ public class SettingsActivity extends BaseActivity {
                 //go back to log in screen
                 Intent nextIntent = new Intent(SettingsActivity.this, LoginActivity.class);
                 startActivity(nextIntent);
+            }
+        });
+
+        deleteFiles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File gamesFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+                File valsFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
+                File versionFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
+                gamesFile.delete();
+                valsFile.delete();
+                versionFile.delete();
             }
         });
     }

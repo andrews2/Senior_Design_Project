@@ -10,6 +10,19 @@
         android:fitsSystemWindows="true"
         tools:openDrawer="start">
 
+    <Button
+        android:id="@+id/delete_files"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/holo_red_light"
+        android:text="Delete chace/files"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logout"
+        app:layout_constraintVertical_bias="0.038" />
+
     <TextView
         android:id="@+id/settings_title"
         android:layout_width="wrap_content"

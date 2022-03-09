@@ -54,24 +54,6 @@ public class LoginActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setText("Login");
         tabLayout.getTabAt(1).setText("Signup");
         //set up files
-        File historyVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
-        if(historyVersion.exists()){
-            try{
-                FileInputStream fis = new FileInputStream(historyVersion);
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                AccountDataHandler.getInstance().setHistoryVersion((String) ois.readObject());
-                ois.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-            AccountDataHandler.getInstance().setHistoryVersion("0");
-        }
     }
 
     @Override

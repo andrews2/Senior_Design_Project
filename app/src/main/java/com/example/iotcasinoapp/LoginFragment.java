@@ -14,15 +14,12 @@ import androidx.fragment.app.Fragment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.crypto.SecretKey;
 
-import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
@@ -65,6 +62,25 @@ public class LoginFragment extends Fragment {
                 map.put("name", usernameToSend);
                 map.put("password", passwordToSend);
 
+                File historyVersion = new File(getContext().getFilesDir(), username.getText().toString().toUpperCase() + "_version.ser");
+                if(historyVersion.exists()){
+                    try{
+                        FileInputStream fis = new FileInputStream(historyVersion);
+                        ObjectInputStream ois = new ObjectInputStream(fis);
+                        AccountDataHandler.getInstance().setHistoryVersion((String) ois.readObject());
+                        ois.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    AccountDataHandler.getInstance().setHistoryVersion("0");
+                }
+
 
                 Call<LoginResult> call = retrofitInterface.executeLogin(map);
                 call.enqueue(new Callback<LoginResult>() {
@@ -74,21 +90,16 @@ public class LoginFragment extends Fragment {
                             LoginResult result = response.body();
                             //check if we need to download history
                             if(!(AccountDataHandler.getInstance().getHistoryVersion().equals(result.getVersion()))){
-                                File versionFile = new File(getContext().getFilesDir(), result.getUsername() + "_version.ser");
-                                File gamesFile = new File(getContext().getFilesDir(), result.getUsername() + "_games.ser");
-                                File valsFile = new File(getContext().getFilesDir(), result.getUsername() + "_vals.ser");
-                                new GetHistFiles(gamesFile, valsFile, versionFile, result.getVersion());
+                                AccountDataHandler.getInstance().setHistoryUpToDate(false);
                             }
                             else{
-                                AccountDataHandler.getInstance().historyFilesUpToDate = true;
+                                AccountDataHandler.getInstance().setHistoryUpToDate(true);
                             }
-
 
                             // save account value in handler
                             AccountDataHandler.getInstance().setAccountValue(result.getAccountValue());
                             AccountDataHandler.getInstance().setUsername(result.getUsername());
                             AccountDataHandler.getInstance().setHistoryVersion(result.getVersion());
-
                             //start main activity
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
                             getActivity().startActivity(nextIntent);

@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -26,6 +25,8 @@ public class GetHistFiles implements Runnable {
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
     File gamesFile;
     File valsFile;
+    volatile boolean gamesDoneWriting;
+    volatile boolean valsDoneWriting;
     File versionFile;
     String version;
     Thread thread;
@@ -43,6 +44,8 @@ public class GetHistFiles implements Runnable {
 
     @Override
     public void run() {
+        gamesDoneWriting = false;
+        valsDoneWriting = false;
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("name", AccountDataHandler.getInstance().getUsername());
 
@@ -67,6 +70,7 @@ public class GetHistFiles implements Runnable {
                     }
                     os.flush();
                     os.close();
+                    gamesDoneWriting = true;
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -101,6 +105,7 @@ public class GetHistFiles implements Runnable {
                     }
                     os.flush();
                     os.close();
+                    valsDoneWriting = true;
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -122,16 +127,15 @@ public class GetHistFiles implements Runnable {
             e.printStackTrace();
         }
 
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while(!(gamesFile.exists() && valsFile.exists() && valsDoneWriting && gamesDoneWriting)){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
-        try{
-            MainActivity.t.start();
-        } catch (Exception e){}
-
+        AccountDataHandler.getInstance().setHistoryUpToDate(true);
+        return;
     }
 }
 

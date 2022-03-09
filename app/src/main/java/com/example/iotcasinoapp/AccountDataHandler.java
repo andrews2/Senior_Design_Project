@@ -1,18 +1,14 @@
 package com.example.iotcasinoapp;
 
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Multimap;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class AccountDataHandler {
     private int accountValue;
     private String username;
-    private ArrayList<String> historyGames = new ArrayList<String>();
-    private ArrayList<String> historyVals = new ArrayList<String>();
+    private volatile ArrayList<String> historyGames = new ArrayList<String>();
+    private volatile ArrayList<String> historyVals = new ArrayList<String>();
     private String historyVersion;
-    public volatile boolean historyFilesUpToDate = false;
+    private volatile boolean historyUpToDate = false;
 
 
     public int getAccountValue() {
@@ -62,10 +58,20 @@ public class AccountDataHandler {
     public void setHistoryVersion(String historyVersion) {
         this.historyVersion = historyVersion;
     }
+
+    public boolean isHistoryUpToDate() {
+        return historyUpToDate;
+    }
+
+    public void setHistoryUpToDate(boolean historyUpToDate) {
+        this.historyUpToDate = historyUpToDate;
+    }
     // create instance of account data handler
     private static final AccountDataHandler accountDataHandler = new AccountDataHandler();
     //return the instance
     public static AccountDataHandler getInstance() {
         return accountDataHandler;
     }
+
+
 }
