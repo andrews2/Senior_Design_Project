@@ -54,7 +54,12 @@ public class GetHistFiles implements Runnable {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.code() != 200){ //make sure it gets response
+                    new GetHistFiles(gamesFile, valsFile, versionFile, version);
+                    return;
+                }
                 try {
+
                     byte[] fileReader = new byte[4096];
                     long fileSize = response.body().contentLength();
                     InputStream is = response.body().byteStream();
@@ -79,7 +84,8 @@ public class GetHistFiles implements Runnable {
             }
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                new GetHistFiles(gamesFile, valsFile, versionFile, version);
+                return;
             }
         });
 
@@ -89,6 +95,10 @@ public class GetHistFiles implements Runnable {
         call1.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.code() != 200){ //make sure it gets response
+                    new GetHistFiles(gamesFile, valsFile, versionFile, version);
+                    return;
+                }
                 try {
                     byte[] fileReader = new byte[4096];
                     long fileSize = response.body().contentLength();
@@ -115,9 +125,12 @@ public class GetHistFiles implements Runnable {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                new GetHistFiles(gamesFile, valsFile, versionFile, version);
+                return;
             }
         });
+
+
         try {
             FileOutputStream fos = new FileOutputStream(versionFile);
             ObjectOutputStream oos = new ObjectOutputStream(fos);

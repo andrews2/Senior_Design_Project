@@ -6,6 +6,7 @@ import java.util.HashMap;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface RetrofitInterface {
@@ -21,4 +22,10 @@ public interface RetrofitInterface {
 
     @POST("/getHistVals")
     Call<ResponseBody> executeGetHistVals(@Body HashMap<String, String> map);
+
+    @POST("/wake")
+    Call<Void> executeWake();
+
+    @POST("/updateHist")
+    Call<Void> exexcuteUpdateHist(@Body HashMap<String, byte[]> map);
 }

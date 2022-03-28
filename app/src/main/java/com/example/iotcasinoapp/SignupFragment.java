@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -29,6 +32,9 @@ public class SignupFragment extends Fragment {
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
+    File historyGames;
+    File historyVals;
+    File historyVersion;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.signup_fragment, container, false);
@@ -39,6 +45,7 @@ public class SignupFragment extends Fragment {
         confrimPassword = root.findViewById(R.id.ConfirmPassword);
         retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
         retrofitInterface = retrofit.create(RetrofitInterface.class);
+
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +80,26 @@ public class SignupFragment extends Fragment {
                             // successful signup attempt, start main activity
                             AccountDataHandler.getInstance().setAccountValue(0);
                             AccountDataHandler.getInstance().setUsername(username.getText().toString().toUpperCase());
+                            AccountDataHandler.getInstance().setHistoryVersion(String.valueOf(0));
+                            // create empty history files
+                            try{
+                                historyGames = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+                                historyVals = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
+                                historyVersion = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
+                                //make blank history games file
+                                FileOutputStream fos = new FileOutputStream(historyGames);
+                                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                                oos.writeObject(AccountDataHandler.getInstance().getHistoryGames());
+                                //make blank history vals file
+                                fos = new FileOutputStream(historyVals);
+                                oos = new ObjectOutputStream(fos);
+                                oos.writeObject(AccountDataHandler.getInstance().getHistoryVals());
+                                //make version file with 0
+                                fos = new FileOutputStream(historyVersion);
+                                oos = new ObjectOutputStream(fos);
+                                oos.writeObject(AccountDataHandler.getInstance().getHistoryVersion());
+                                AccountDataHandler.getInstance().setHistoryUpToDate(true);
+                            } catch (Exception e){}
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
                             getActivity().startActivity(nextIntent);
                         } else if(response.code() == 400){

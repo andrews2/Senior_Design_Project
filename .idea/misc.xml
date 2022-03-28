@@ -13,6 +13,8 @@
         <entry key="app/src/main/res/drawable/li_btn.xml" value="0.1535" />
         <entry key="app/src/main/res/drawable/menu_icon.xml" value="0.1715" />
         <entry key="app/src/main/res/drawable/pocker_bkg_background.xml" value="0.1715" />
+        <entry key="app/src/main/res/drawable/white_circle.xml" value="0.1715" />
+        <entry key="app/src/main/res/drawable/wolf_logo.xml" value="0.1715" />
         <entry key="app/src/main/res/layout/activity_base.xml" value="0.30364583333333334" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
@@ -26,6 +28,7 @@
         <entry key="app/src/main/res/layout/login_tab_fragment.xml" value="0.17798913043478262" />
         <entry key="app/src/main/res/layout/signup_fragment.xml" value="0.21739130434782608" />
         <entry key="app/src/main/res/layout/signup_tab_fragment.xml" value="0.17798913043478262" />
+        <entry key="app/src/main/res/layout/white_circle.xml" value="0.21739130434782608" />
         <entry key="app/src/main/res/menu/navigation_menu.xml" value="0.30364583333333334" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/pocker_bkg.xml" value="0.1715" />
         <entry key="app/src/main/res/xml/nfc_filters.xml" value="0.21739130434782608" />

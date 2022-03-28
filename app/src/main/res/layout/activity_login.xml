@@ -7,6 +7,32 @@
     tools:context=".LoginActivity">
 
 
+    <ImageView
+        android:id="@+id/wolf_background"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/white_circle"
+        app:layout_constraintBottom_toTopOf="@+id/wp_casino_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/background"
+        app:layout_constraintVertical_bias="0.92" />
+
+    <ImageView
+        android:id="@+id/login_wolf"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        app:layout_constraintVertical_bias="0.65"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintBottom_toBottomOf="@+id/wolf_background"
+        app:layout_constraintEnd_toEndOf="@+id/wolf_background"
+        app:layout_constraintStart_toStartOf="@+id/wolf_background"
+        app:layout_constraintTop_toTopOf="@+id/wolf_background"
+        app:srcCompat="@drawable/wolf_logo" />
+
     <TextView
         android:id="@+id/wp_casino_label"
         android:layout_width="wrap_content"
