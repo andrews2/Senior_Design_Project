@@ -8,6 +8,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,14 +16,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.File;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
-    ImageView headerImage;
+    ImageView headerImage, profilePicture;
+    Thread t;
+    View headerView;
 
     protected void onCreateDrawer() {
         setContentView(R.layout.activity_base);
@@ -39,11 +45,26 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        View headerView = navigationView.getHeaderView(0);
+        headerView = navigationView.getHeaderView(0);
         headerImage = (ImageView) headerView.findViewById(R.id.header_image);
+        profilePicture = (ImageView) headerView.findViewById(R.id.profile_pic);
         TextView headerText = headerView.findViewById(R.id.header_name);
         headerText.setText(AccountDataHandler.getInstance().getUsername());
         Glide.with(headerView).load(R.drawable.pocker_background).apply(new RequestOptions().override(1152, 1356)).centerCrop().into(headerImage);
+
+        if(AccountDataHandler.getInstance().getProfilePicture().equals("none")){
+            Glide.with(headerView).load(R.drawable.wolf_logo).centerInside().into(profilePicture);
+        }
+        else{
+            File profilePicFile = new File(getFilesDir(), AccountDataHandler.getInstance().getProfilePicture());
+            if (profilePicFile.exists()){
+                updateHeaderProfilePic(profilePicFile);
+            }
+            else{
+                new GetProfilePicture(profilePicFile, this);
+            }
+        }
+
     }
 
     @Override
@@ -76,5 +97,11 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         else{
             super.onBackPressed();
         }
+    }
+
+    public void updateHeaderProfilePic(File file){
+        RequestOptions options = new RequestOptions();
+        options.circleCrop();
+        Glide.with(headerView).load(file).apply(options).into(profilePicture);
     }
 }

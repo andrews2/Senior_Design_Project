@@ -9,6 +9,7 @@ public class AccountDataHandler {
     private volatile ArrayList<String> historyVals = new ArrayList<String>();
     private String historyVersion;
     private volatile boolean historyUpToDate = false;
+    private String profilePicture;
 
 
     public int getAccountValue() {
@@ -66,6 +67,15 @@ public class AccountDataHandler {
     public void setHistoryUpToDate(boolean historyUpToDate) {
         this.historyUpToDate = historyUpToDate;
     }
+
+    public String getProfilePicture(){
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String newPic){
+        this.profilePicture = newPic;
+    }
+
     // create instance of account data handler
     private static final AccountDataHandler accountDataHandler = new AccountDataHandler();
     //return the instance

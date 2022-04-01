@@ -27,10 +27,35 @@
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintHorizontal_bias="0.065"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/header_image"
         app:layout_constraintVertical_bias="0.904" />
+
+    <ImageView
+        android:id="@+id/profile_pic_background"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="64dp"
+        android:background="@drawable/white_circle"
+        app:layout_constraintBottom_toTopOf="@+id/header_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.444" />
+
+    <ImageView
+        android:id="@+id/profile_pic"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:background="@drawable/clear_circle"
+        app:layout_constraintBottom_toBottomOf="@+id/profile_pic_background"
+        app:layout_constraintEnd_toEndOf="@+id/profile_pic_background"
+        app:layout_constraintStart_toStartOf="@+id/profile_pic_background"
+        app:layout_constraintTop_toTopOf="@+id/profile_pic_background" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

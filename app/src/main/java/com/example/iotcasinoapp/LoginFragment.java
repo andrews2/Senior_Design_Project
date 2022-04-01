@@ -100,6 +100,7 @@ public class LoginFragment extends Fragment {
                             AccountDataHandler.getInstance().setAccountValue(result.getAccountValue());
                             AccountDataHandler.getInstance().setUsername(result.getUsername());
                             AccountDataHandler.getInstance().setHistoryVersion(result.getVersion());
+                            AccountDataHandler.getInstance().setProfilePicture(result.getProfilePicture());
                             //start main activity
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
                             getActivity().startActivity(nextIntent);

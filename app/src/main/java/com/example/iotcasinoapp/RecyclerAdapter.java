@@ -1,5 +1,6 @@
 package com.example.iotcasinoapp;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         String val = historyVals.get(position);
         holder.gameText.setText(game);
         holder.winningsOrLosses.setText(val);
-
     }
 
     @Override

@@ -30,7 +30,7 @@ public class UpdateHistFiles implements Runnable{
 
             //write history version
             fos = new FileOutputStream(histVersion);
-            oos = new ObjectOutputStream(oos);
+            oos = new ObjectOutputStream(fos);
             oos.writeObject(AccountDataHandler.getInstance().getHistoryVersion());
         } catch (Exception e) {
             e.printStackTrace();

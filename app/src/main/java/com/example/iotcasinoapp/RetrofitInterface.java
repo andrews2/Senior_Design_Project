@@ -28,4 +28,10 @@ public interface RetrofitInterface {
 
     @POST("/updateHist")
     Call<Void> exexcuteUpdateHist(@Body HashMap<String, byte[]> map);
+
+    @POST("/getProfilePicture")
+    Call<ResponseBody> executeGetProfilePicture(@Body HashMap<String, String> map);
+
+    @POST("/updateProfilePic")
+    Call<Void> executeUpdateProfilePic(@Body HashMap<String, byte[]> map);
 }

@@ -4,6 +4,8 @@ public class LoginResult {
     private String accountValue;
     private String username;
     private String version;
+    private String profilePicture;
+    public String getProfilePicture(){return profilePicture;}
     public int getAccountValue() {
         return Integer.parseInt(accountValue);
     }
