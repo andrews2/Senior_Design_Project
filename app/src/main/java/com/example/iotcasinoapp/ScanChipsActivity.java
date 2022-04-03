@@ -1,33 +1,29 @@
 package com.example.iotcasinoapp;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.nfc.FormatException;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.Ndef;
+import android.nfc.tech.NfcB;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 public class ScanChipsActivity extends BaseActivity {
     // variables
     private NfcAdapter nfcAdapter;
-    private PendingIntent pendingIntent;
+    private PendingIntent nfcPendingIntent;
     private IntentFilter writingTagFilters[];
     private boolean writeMode;
     private Tag tag;
@@ -35,7 +31,10 @@ public class ScanChipsActivity extends BaseActivity {
     Button setButton;
     EditText valueToSet;
     private Context context;
+    private Timer t;
+    ScheduledExecutorService exec;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,40 +50,38 @@ public class ScanChipsActivity extends BaseActivity {
 
         context = this;
 
+        // keep screen on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (tag == null) {
-                    status.setText("No tag found.");
-                } else {
-                    try {
-                        writeChip("PlainText|" + valueToSet.getText().toString(), tag);
-                        status.setText("Written Successfully");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (FormatException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+        setContentView(R.layout.activity_main);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if(nfcAdapter == null){
-            Toast.makeText(context, "No NFC hardware found", Toast.LENGTH_LONG);
-            Intent nextIntent = new Intent(context, MainActivity.class);
-            startActivity(nextIntent);
+
+        if (nfcAdapter == null) {
+            // Stop here, we definitely need NFC
+            status.setText("You don't have an NFC capable device.");
+            finish();
+            return;
         }
-        readFromIntent(getIntent());
-        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        if (!nfcAdapter.isEnabled()) {
+            status.setText("NFC Adapter is not turned on");
+        } else {
+            //mTextView.setText(R.string.explanation);
+            t = new Timer();
+            exec = Executors.newSingleThreadScheduledExecutor();
+        }
+        //FLAG_ACTIVITY_SINGLE_TOP: If set, the activity will not be launched if it is already running at the top of the history stack.
+        nfcPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, this.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        // readFromIntent(getIntent());
         IntentFilter chipDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         chipDetected.addCategory(Intent.CATEGORY_DEFAULT);
         writingTagFilters = new IntentFilter[] { chipDetected };
     }
 
-    private void readFromIntent(Intent intent){
+    /* private void readFromIntent(Intent intent){
         String action = intent.getAction();
         if(actionType(action)){
             Parcelable[] rawMsg = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -97,92 +94,89 @@ public class ScanChipsActivity extends BaseActivity {
             }
             buildTagView(msg);
         }
-    }
-
-    private boolean actionType(String action){
-        // check if tag discovered is correct type
-        return (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action));
-    }
-
-    private void buildTagView(NdefMessage[] msg){
-        if((msg == null) || msg.length == 0) return;
-        String text = "";
-        byte[] payload = msg[0].getRecords()[0].getPayload();
-        String encoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
-        int lanCodeLen = payload[0] & 0063;
-
-        try{
-            text = new String(payload, lanCodeLen + 11, 3, encoding);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        readValue.setText("$" + text);
-    }
-
-    private void writeChip(String text, Tag tag) throws IOException, FormatException{
-        NdefRecord[] records = { createRecord(text)};
-        NdefMessage msg = new NdefMessage(records);
-        Ndef ndef = Ndef.get(tag);
-        ndef.connect();
-        ndef.writeNdefMessage(msg);
-        ndef.close();
-    }
-
-    private NdefRecord createRecord(String text) throws UnsupportedEncodingException {
-        String lang = "eng";
-        String tagType = "PokerChip";
-        byte[] typeBytes = tagType.getBytes();
-        byte[] textBytes = text.getBytes();
-        byte[] langBytes = lang.getBytes("US-ASCII");
-        int langLength = langBytes.length;
-        int textLength = textBytes.length;
-        byte[] payload = new byte[1 + langLength + textLength];
-
-        payload[0] = (byte) langLength;
-        System.arraycopy(langBytes, 0, payload, 1, langLength);
-        System.arraycopy(textBytes, 0, payload, 1+langLength, textLength);
-
-        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, typeBytes, new byte[0], payload);
-
-        return recordNFC;
-    }
+    } */
 
     @Override
-    protected void onNewIntent(Intent intent){
-        super.onNewIntent(intent);
-        setIntent(intent);
-        readFromIntent(intent);
-        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){
-            tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        }
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        writeModeOff();
-    }
-
-    @Override
-    public void onResume(){
+    protected void onResume() {
         super.onResume();
-        writeModeOn();
+        // disable sound if possible.
+        // this should enable the reader mode for NFCA tags without the sound, but it only works once and then crashes the NFC reader so a reboot is required
+        //nfcAdapter.enableReaderMode(this, this, NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS, null);
+        nfcAdapter.enableForegroundDispatch(this, nfcPendingIntent, null, null);
     }
 
-    private void writeModeOn(){
-        writeMode = true;
-        nfcAdapter.enableForegroundDispatch(this, pendingIntent, writingTagFilters, null);
-    }
-
-    private void writeModeOff(){
-        writeMode = false;
+    @Override
+    protected void onPause() {
+        super.onPause();
         nfcAdapter.disableForegroundDispatch(this);
     }
 
+    @Override
+    public void onNewIntent(Intent intent) { // this method is called when an NFC tag is scanned
+        super.onNewIntent(intent);
+        String action = intent.getAction();
+        switch (action) {
+            case NfcAdapter.ACTION_NDEF_DISCOVERED:
+                //mTextView.setText("NDEF");
+                break;
+            case NfcAdapter.ACTION_TECH_DISCOVERED:
+                //mTextView.setText("TECH");
+                break;
+            case NfcAdapter.ACTION_TAG_DISCOVERED:
+                //mTextView.setText("TAG");
+                Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                System.out.println(tag.toString());
+                startGlove(tag);
+                break;
+        }
+    }
 
+    private void startGlove(Tag tag) {
+        String tech = tag.getTechList()[0];
+        System.out.println(tech);
+        switch (tech) {
+            case "android.nfc.tech.NfcA":
+                System.out.println("NfcA");
+                break;
+            case "android.nfc.tech.NfcB":
+                System.out.println("NfcB");
+                // NfcB nfcB = NfcB.get(tag);
+                // byte[] applicationData = nfcB.getApplicationData();
+                // System.out.println(Arrays.toString(applicationData));
+                // startVibrating(NfcB.get(tag));
+                break;
+            case "android.nfc.tech.NfcF":
+                System.out.println("NfcF");
+                break;
+            case "android.nfc.tech.NfcV":
+                System.out.println("NfcV");
+                break;
 
+            // NFC Wisp will enter this case statement always
+            case "android.nfc.tech.IsoDep":
+                System.out.println("IsoDep Detected");
+                NfcB nfcB = NfcB.get(tag);
+                byte[] applicationData = nfcB.getApplicationData();
+                System.out.println(Arrays.toString(applicationData));
+                break;
 
+            case "android.nfc.tech.Ndef":
+                System.out.println("Ndef Format");
+                break;
+            case "android.nfc.tech.MifareClassic":
+                System.out.println("Mifare");
+                break;
+            case "android.nfc.tech.MifareUltralight":
+                System.out.println("Mifare Ultra Light");
+                break;
+            case "android.nfc.tech.NdefFormatable":
+                System.out.println("Ndef Formatable");
+                break;
+        }
+    }
+
+    public void onTagDiscovered(Tag tag) {
+        System.out.println("Tag discovered in reader mode");
+        startGlove(tag);
+    }
 }
