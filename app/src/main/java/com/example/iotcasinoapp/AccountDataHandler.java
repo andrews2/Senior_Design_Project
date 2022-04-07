@@ -22,6 +22,10 @@ public class AccountDataHandler {
         this.accountValue = accountValue;
     }
 
+    public void addToAccountValue(int val){
+        this.accountValue += val;
+    }
+
     public String getUsername() {
         //username getter
         return username;
@@ -58,6 +62,11 @@ public class AccountDataHandler {
     }
     public void setHistoryVersion(String historyVersion) {
         this.historyVersion = historyVersion;
+    }
+    public void incrementHistoryVersion(){
+        int currentVersion = Integer.parseInt(this.historyVersion);
+        currentVersion++;
+        this.historyVersion = String.valueOf(currentVersion);
     }
 
     public boolean isHistoryUpToDate() {

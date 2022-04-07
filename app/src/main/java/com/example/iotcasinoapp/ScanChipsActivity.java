@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import java.io.File;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.concurrent.Executors;
@@ -33,6 +35,7 @@ public class ScanChipsActivity extends BaseActivity {
     private Context context;
     private Timer t;
     ScheduledExecutorService exec;
+    String tagID;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -51,9 +54,8 @@ public class ScanChipsActivity extends BaseActivity {
         context = this;
 
         // keep screen on
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.activity_main);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -157,7 +159,38 @@ public class ScanChipsActivity extends BaseActivity {
                 System.out.println("IsoDep Detected");
                 NfcB nfcB = NfcB.get(tag);
                 byte[] applicationData = nfcB.getApplicationData();
-                System.out.println(Arrays.toString(applicationData));
+                byte[] tagIDbytes = tag.getId();  // Gets the ID of NFC Tag
+                tagID = bytesToHexString(tagIDbytes);   // Converts tagID into readable format
+                System.out.println(tagID);
+                String gameType = "";
+                int chipValue;
+                String dataString = bytesToHexString(applicationData);
+
+                switch(dataString.charAt(2)){
+                    case '0':
+                        gameType = "Poker";
+                        break;
+                    case '1':
+                        gameType = "Black Jack";
+                        break;
+                    case '2':
+                        gameType = "Craps";
+                        break;
+                    case '3':
+                        gameType = "Other";
+                        break;
+                }
+
+                chipValue = Integer.parseInt(dataString.substring(3));
+                System.out.println(chipValue);
+                System.out.println(gameType);
+                AccountDataHandler.getInstance().addToHistory(gameType, "+" + String.valueOf(chipValue));
+                AccountDataHandler.getInstance().addToAccountValue(chipValue);
+                AccountDataHandler.getInstance().incrementHistoryVersion();
+                File histGames = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+                File histVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
+                File histVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
+                new UpdateHistFiles(histGames, histVals, histVersion);
                 break;
 
             case "android.nfc.tech.Ndef":
@@ -178,5 +211,22 @@ public class ScanChipsActivity extends BaseActivity {
     public void onTagDiscovered(Tag tag) {
         System.out.println("Tag discovered in reader mode");
         startGlove(tag);
+    }
+
+    private String bytesToHexString(byte[] src) {
+        StringBuilder stringBuilder = new StringBuilder("0x");
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+
+        char[] buffer = new char[2];
+        for (int i = 0; i < src.length; i++) {
+            buffer[0] = Character.forDigit((src[i] >>> 4) & 0x0F, 16);
+            buffer[1] = Character.forDigit(src[i] & 0x0F, 16);
+            //System.out.println(buffer);
+            stringBuilder.append(buffer);
+        }
+
+        return stringBuilder.toString();
     }
 }
