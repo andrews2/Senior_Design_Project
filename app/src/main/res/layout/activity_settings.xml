@@ -11,6 +11,32 @@
         tools:openDrawer="start">
 
     <TextView
+        android:id="@+id/Application_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Application"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.044"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view2"
+        app:layout_constraintVertical_bias=".038"/>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias=".038"/>
+
+    <TextView
         android:id="@+id/settings_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,39 +86,64 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view" />
 
+        <ImageView
+            android:id="@+id/settings_prof_pic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintTop_toBottomOf="@id/account_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias=".038"
+            app:layout_constraintHorizontal_bias=".044"
+            />
+
+        <TextView
+            android:id="@+id/change_pic_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change Profile Picture"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_prof_pic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias=".038"
+            app:layout_constraintHorizontal_bias=".044"/>
+
         <TextView
             android:id="@+id/username_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.044"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/account_title"
-            app:layout_constraintVertical_bias="0.038" />
+            app:layout_constraintTop_toBottomOf="@+id/settings_prof_pic"
+            app:layout_constraintVertical_bias="0.15" />
 
         <TextView
             android:id="@+id/username_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username"
-            android:textSize="16sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/alignment"
-            app:layout_constraintTop_toBottomOf="@+id/account_title"
-            app:layout_constraintVertical_bias="0.038" />
+            app:layout_constraintTop_toBottomOf="@+id/settings_prof_pic"
+            app:layout_constraintVertical_bias="0.15" />
 
         <TextView
             android:id="@+id/account_value_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Account Value"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -106,7 +157,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
-            android:textSize="16sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -114,31 +165,6 @@
             app:layout_constraintTop_toBottomOf="@+id/username_text"
             app:layout_constraintVertical_bias="0.038" />
 
-    <TextView
-        android:id="@+id/profile_pic_setting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profile Picture"
-        android:textColor="@color/black"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/account_value_setting"
-        app:layout_constraintTop_toBottomOf="@id/account_value_setting"
-        app:layout_constraintVertical_bias="0.067" />
-
-    <Button
-        android:id="@+id/change_picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="Change Profile Picture"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/account_value"
-        app:layout_constraintVertical_bias="0.038" />
 
     <Button
         android:id="@+id/logout"
@@ -149,20 +175,46 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/change_picture"
+        app:layout_constraintTop_toBottomOf="@+id/account_value_setting"
         app:layout_constraintVertical_bias="0.038" />
+
+    <TextView
+        android:id="@+id/version_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Version"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Application_title"
+        app:layout_constraintVertical_bias=".038"
+        app:layout_constraintHorizontal_bias=".044"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1.0.0"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Application_title"
+        app:layout_constraintStart_toStartOf="@+id/alignment"
+        app:layout_constraintVertical_bias=".038"
+        app:layout_constraintHorizontal_bias="0"/>
 
     <Button
         android:id="@+id/delete_files"
         android:layout_width="225dp"
         android:layout_height="wrap_content"
-        android:text="Delete chace/files"
+        android:text="Delete cache/files"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logout"
-        app:layout_constraintVertical_bias="0.877" />
+        app:layout_constraintTop_toBottomOf="@+id/version_setting"
+        app:layout_constraintVertical_bias="0.1" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

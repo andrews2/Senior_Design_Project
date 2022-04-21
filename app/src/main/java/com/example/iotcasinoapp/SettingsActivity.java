@@ -1,25 +1,14 @@
 package com.example.iotcasinoapp;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.provider.MediaStore;
-import android.view.MenuItem;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -27,20 +16,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.navigation.NavigationView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 public class SettingsActivity extends BaseActivity {
-    TextView usernameText, accountValue;
+    TextView usernameText, accountValue, changePicText;
     Button logout, deleteFiles, changePicture;
+    ImageView profilePic;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +35,38 @@ public class SettingsActivity extends BaseActivity {
         super.onCreateDrawer();
         FrameLayout pageContainer = (FrameLayout) findViewById(R.id.page_container);
         getLayoutInflater().inflate(R.layout.activity_settings, pageContainer);
-        //intit settings values
+        //init settings values
+        context = this;
         usernameText = findViewById(R.id.username_text);
         accountValue = findViewById(R.id.account_value);
         logout = findViewById(R.id.logout);
         deleteFiles = findViewById(R.id.delete_files);
-        changePicture = findViewById(R.id.change_picture);
+        changePicText = findViewById(R.id.change_pic_text);
+        profilePic = findViewById(R.id.settings_prof_pic);
         usernameText.setText(AccountDataHandler.getInstance().getUsername());
         accountValue.setText(String.valueOf(AccountDataHandler.getInstance().getAccountValue()));
+
+        //set text to be underlined for change profile pic text
+        SpannableString spannableString = new SpannableString("Change Profile Picture");
+        spannableString.setSpan(new UnderlineSpan(), 0, spannableString.length(), 0);
+        changePicText.setText(spannableString);
+        changePicText.bringToFront();
+
+        //set profile picture
+        if(AccountDataHandler.getInstance().getProfilePicture().equals("none")){
+            Glide.with(context).load(R.drawable.wolf_logo).centerInside().into(profilePic);
+        }
+        else{
+            File profilePicFile = new File(getFilesDir(), AccountDataHandler.getInstance().getProfilePicture());
+            if (profilePicFile.exists()){
+                RequestOptions options = new RequestOptions();
+                options.circleCrop();
+                Glide.with(context).load(profilePicFile).apply(options).into(profilePic);
+            }
+            else{
+                new GetProfilePicture(profilePicFile, this);
+            }
+        }
 
 
         logout.setOnClickListener(new View.OnClickListener() {
@@ -70,16 +81,16 @@ public class SettingsActivity extends BaseActivity {
         deleteFiles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File gamesFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+                File idsFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_ids.ser");
                 File valsFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
                 File versionFile = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
-                gamesFile.delete();
+                idsFile.delete();
                 valsFile.delete();
                 versionFile.delete();
             }
         });
 
-        changePicture.setOnClickListener(new View.OnClickListener() {
+        changePicText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -99,12 +110,12 @@ public class SettingsActivity extends BaseActivity {
             }
 
             Uri imageUri = data.getData();
-            String fileName = AccountDataHandler.getInstance().getUsername() + '_' + imageUri.getPath().substring(imageUri.getPath().lastIndexOf('/') + 1) + ".jpg";
+            String fileName = AccountDataHandler.getInstance().getUsername() + '_' + imageUri.getPath().substring(imageUri.getPath().lastIndexOf('/') + 1) + ".webp";
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                 File file = new File(getFilesDir(), fileName);
                 FileOutputStream out = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                bitmap.compress(Bitmap.CompressFormat.WEBP, 75, out);
                 out.close();
                 if(file.length() > 30000000){
                     Toast.makeText(this, "Image file size is too large.", Toast.LENGTH_LONG).show();
@@ -113,6 +124,9 @@ public class SettingsActivity extends BaseActivity {
                 }
                 AccountDataHandler.getInstance().setProfilePicture(fileName);
                 updateHeaderProfilePic(file);
+                RequestOptions options = new RequestOptions();
+                options.circleCrop();
+                Glide.with(context).load(file).apply(options).into(profilePic);
                 new UpdateProfilePicOnServer(file);
             } catch (Exception e) {
                 e.printStackTrace();

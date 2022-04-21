@@ -14,13 +14,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UpdateHistFilesOnServer implements Runnable{
-    File histGames, histVals;
+    File histIDs, histVals;
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
 
-    public UpdateHistFilesOnServer(File histGames, File histVals){
-        this.histGames = histGames;
+    public UpdateHistFilesOnServer(File histIDs, File histVals){
+        this.histIDs = histIDs;
         this.histVals = histVals;
         retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
         retrofitInterface = retrofit.create(RetrofitInterface.class);
@@ -29,10 +29,10 @@ public class UpdateHistFilesOnServer implements Runnable{
 
     @Override
     public void run() {
-        byte[] histGamesBytes = new byte[0];
+        byte[] histIDsBytes = new byte[0];
         byte[] histValsBytes = new byte[0];
         try {
-            histGamesBytes = Files.toByteArray(histGames);
+            histIDsBytes = Files.toByteArray(histIDs);
             histValsBytes = Files.toByteArray(histVals);
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,7 +42,7 @@ public class UpdateHistFilesOnServer implements Runnable{
         map.put("uName", AccountDataHandler.getInstance().getUsername().getBytes(StandardCharsets.UTF_8));
         map.put("value", String.valueOf(AccountDataHandler.getInstance().getAccountValue()).getBytes(StandardCharsets.UTF_8));
         map.put("version", AccountDataHandler.getInstance().getHistoryVersion().getBytes(StandardCharsets.UTF_8));
-        map.put("histGames", histGamesBytes);
+        map.put("histIDs", histIDsBytes);
         map.put("histVals", histValsBytes);
 
         Call<Void> call = retrofitInterface.exexcuteUpdateHist(map);
@@ -51,14 +51,14 @@ public class UpdateHistFilesOnServer implements Runnable{
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.code() != 200){
-                    new UpdateHistFilesOnServer(histGames, histVals);
+                    new UpdateHistFilesOnServer(histIDs, histVals);
                     return;
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                new UpdateHistFilesOnServer(histGames, histVals);
+                new UpdateHistFilesOnServer(histIDs, histVals);
                 return;
             }
         });

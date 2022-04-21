@@ -1,15 +1,14 @@
 package com.example.iotcasinoapp;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
 public class UpdateHistFiles implements Runnable{
-    File histGames, histVals, histVersion;
+    File histIDs, histVals, histVersion;
 
-    public UpdateHistFiles(File histGames, File histVals, File histVersion){
-        this.histGames = histGames;
+    public UpdateHistFiles(File histIDs, File histVals, File histVersion){
+        this.histIDs = histIDs;
         this.histVals = histVals;
         this.histVersion = histVersion;
         new Thread(this).start();
@@ -19,9 +18,9 @@ public class UpdateHistFiles implements Runnable{
     public void run() {
         try {
             //write history games
-            FileOutputStream fos = new FileOutputStream(histGames);
+            FileOutputStream fos = new FileOutputStream(histIDs);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(AccountDataHandler.getInstance().getHistoryGames());
+            oos.writeObject(AccountDataHandler.getInstance().getHistoryIDs());
 
             //write history values
             fos = new FileOutputStream(histVals);
@@ -32,9 +31,10 @@ public class UpdateHistFiles implements Runnable{
             fos = new FileOutputStream(histVersion);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(AccountDataHandler.getInstance().getHistoryVersion());
+            oos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        new UpdateHistFilesOnServer(histGames, histVals);
+        new UpdateHistFilesOnServer(histIDs, histVals);
     }
 }

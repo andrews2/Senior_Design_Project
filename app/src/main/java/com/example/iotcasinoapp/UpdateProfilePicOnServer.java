@@ -53,6 +53,7 @@ public class UpdateProfilePicOnServer implements Runnable {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
+                System.out.println(t);
                 new UpdateProfilePicOnServer(imageFile);
                 return;
             }

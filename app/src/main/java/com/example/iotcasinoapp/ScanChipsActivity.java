@@ -10,16 +10,30 @@ import android.nfc.Tag;
 import android.nfc.tech.NfcB;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class ScanChipsActivity extends BaseActivity {
@@ -32,10 +46,14 @@ public class ScanChipsActivity extends BaseActivity {
     TextView readValue, status;
     Button setButton;
     EditText valueToSet;
+    ImageView spinningChip;
     private Context context;
     private Timer t;
     ScheduledExecutorService exec;
     String tagID;
+    private Retrofit retrofit;
+    private RetrofitInterface retrofitInterface;
+    private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -44,30 +62,42 @@ public class ScanChipsActivity extends BaseActivity {
         super.onCreateDrawer();
         FrameLayout pageContainer = (FrameLayout) findViewById(R.id.page_container);
         getLayoutInflater().inflate(R.layout.activity_scan_chips, pageContainer);
-
-        //set GUI objects
-        readValue = findViewById(R.id.tag_value);
-        status = findViewById(R.id.status_text);
-        setButton = findViewById(R.id.set_button);
-        valueToSet = findViewById(R.id.value_to_set);
-
         context = this;
+
+        spinningChip = findViewById(R.id.spinning_chip);
+        Glide.with(context).load(R.drawable.spinning_chip).into(spinningChip);
+        RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotateAnimation.setDuration(5000);
+        rotateAnimation.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setRepeatCount(Animation.INFINITE);
+
+        spinningChip.setAnimation(rotateAnimation);
+
+
 
         // keep screen on
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        retrofitInterface = retrofit.create(RetrofitInterface.class);
 
 
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        try{
+            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        } catch (Exception e){
+            Toast.makeText(this, "This device does not have NFC capabilities", Toast.LENGTH_LONG).show();
+            Intent nextIntent = new Intent(this, MainActivity.class);
+            startActivity(nextIntent);
+        }
+
 
         if (nfcAdapter == null) {
             // Stop here, we definitely need NFC
-            status.setText("You don't have an NFC capable device.");
+            Toast.makeText(this, "This device does not have NFC capabilities", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
         if (!nfcAdapter.isEnabled()) {
-            status.setText("NFC Adapter is not turned on");
         } else {
             //mTextView.setText(R.string.explanation);
             t = new Timer();
@@ -156,41 +186,47 @@ public class ScanChipsActivity extends BaseActivity {
 
             // NFC Wisp will enter this case statement always
             case "android.nfc.tech.IsoDep":
+                //when NFC wisp is read
                 System.out.println("IsoDep Detected");
                 NfcB nfcB = NfcB.get(tag);
                 byte[] applicationData = nfcB.getApplicationData();
                 byte[] tagIDbytes = tag.getId();  // Gets the ID of NFC Tag
                 tagID = bytesToHexString(tagIDbytes);   // Converts tagID into readable format
-                System.out.println(tagID);
-                String gameType = "";
                 int chipValue;
                 String dataString = bytesToHexString(applicationData);
-
-                switch(dataString.charAt(2)){
-                    case '0':
-                        gameType = "Poker";
-                        break;
-                    case '1':
-                        gameType = "Black Jack";
-                        break;
-                    case '2':
-                        gameType = "Craps";
-                        break;
-                    case '3':
-                        gameType = "Other";
-                        break;
-                }
-
                 chipValue = Integer.parseInt(dataString.substring(3));
-                System.out.println(chipValue);
-                System.out.println(gameType);
-                AccountDataHandler.getInstance().addToHistory(gameType, "+" + String.valueOf(chipValue));
-                AccountDataHandler.getInstance().addToAccountValue(chipValue);
-                AccountDataHandler.getInstance().incrementHistoryVersion();
-                File histGames = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
-                File histVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
-                File histVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
-                new UpdateHistFiles(histGames, histVals, histVersion);
+
+                HashMap<String, String> map = new HashMap<>();
+                map.put("chipID", tagID);
+                map.put("name", AccountDataHandler.getInstance().getUsername());
+
+                //send server message to check chip ID
+                Call<Void> call = retrofitInterface.executeAddChip(map);
+
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        // chip is not currently owned
+                        if(response.code() == 200){
+                            AccountDataHandler.getInstance().addToHistory(tagID, String.valueOf(chipValue));
+                            AccountDataHandler.getInstance().addToAccountValue(chipValue);
+                            AccountDataHandler.getInstance().incrementHistoryVersion();
+                            File histIDs = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_ids.ser");
+                            File histVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
+                            File histVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
+                            new UpdateHistFiles(histIDs, histVals, histVersion);
+                        }
+                        // if chip is already owned
+                        else if(response.code() == 400){
+                            Toast.makeText(context, "Someone already owns this chip", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(context, "Error connecting to server", Toast.LENGTH_LONG).show();
+                    }
+                });
+                // Send NFCID:Uname to the server, and it'll add to the owned map
                 break;
 
             case "android.nfc.tech.Ndef":

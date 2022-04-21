@@ -7,6 +7,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 
 public interface RetrofitInterface {
@@ -17,8 +18,8 @@ public interface RetrofitInterface {
     @POST("/signup")
     Call<Void> executeSignup(@Body HashMap<String, String> map);
 
-    @POST("/getHistGames")
-    Call<ResponseBody> executeGetHistGames(@Body HashMap<String, String> map);
+    @POST("/getHistIDs")
+    Call<ResponseBody> executeGetHistIDs(@Body HashMap<String, String> map);
 
     @POST("/getHistVals")
     Call<ResponseBody> executeGetHistVals(@Body HashMap<String, String> map);
@@ -34,4 +35,10 @@ public interface RetrofitInterface {
 
     @POST("/updateProfilePic")
     Call<Void> executeUpdateProfilePic(@Body HashMap<String, byte[]> map);
+
+    @POST("/addChip")
+    Call<Void> executeAddChip(@Body HashMap<String, String> map);
+
+    @POST("/putChipInPlay")
+    Call<Void> executePutChipInPlay(@Body HashMap<String, String> map);
 }

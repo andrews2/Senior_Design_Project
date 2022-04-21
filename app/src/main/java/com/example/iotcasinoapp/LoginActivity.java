@@ -44,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
-    File histGames, histVals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

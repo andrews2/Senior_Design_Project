@@ -28,7 +28,7 @@ public class MainActivity extends BaseActivity {
     RecyclerAdapter recyclerAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
     public Thread t;
-    File historyGames;
+    File historyIDs;
     File historyVals;
     File historyVersion;
 
@@ -42,7 +42,7 @@ public class MainActivity extends BaseActivity {
         Intent intent = getIntent();
         context = this;
         // get files
-        historyGames = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+        historyIDs = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_ids.ser");
         historyVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
         historyVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
         // set text view to account value
@@ -64,9 +64,9 @@ public class MainActivity extends BaseActivity {
                     }
                 }
                 try {
-                    FileInputStream fis = new FileInputStream(historyGames);
+                    FileInputStream fis = new FileInputStream(historyIDs);
                     ObjectInputStream ois = new ObjectInputStream(fis);
-                    AccountDataHandler.getInstance().setHistoryGames((ArrayList<String>) ois.readObject());
+                    AccountDataHandler.getInstance().setHistoryIDs((ArrayList<String>) ois.readObject());
                     fis = new FileInputStream(historyVals);
                     ois = new ObjectInputStream(fis);
                     AccountDataHandler.getInstance().setHistoryVals((ArrayList<String>) ois.readObject());
@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity {
         });
 
         if(!AccountDataHandler.getInstance().isHistoryUpToDate()){
-            new GetHistFiles(historyGames, historyVals, historyVersion, AccountDataHandler.getInstance().getHistoryVersion());
+            new GetHistFiles(historyIDs, historyVals, historyVersion, AccountDataHandler.getInstance().getHistoryVersion());
         }
         t.start();
 
@@ -99,9 +99,9 @@ public class MainActivity extends BaseActivity {
     }
 
     public void setAdapter(){
-        ArrayList<String> historyGames = AccountDataHandler.getInstance().getHistoryGames();
+        ArrayList<String> historyIDs = AccountDataHandler.getInstance().getHistoryIDs();
         ArrayList<String> historyVals = AccountDataHandler.getInstance().getHistoryVals();
-        recyclerAdapter = new RecyclerAdapter(historyGames, historyVals);
+        recyclerAdapter = new RecyclerAdapter(historyIDs, historyVals);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

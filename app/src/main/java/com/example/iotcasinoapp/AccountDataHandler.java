@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class AccountDataHandler {
     private int accountValue;
     private String username;
-    private volatile ArrayList<String> historyGames = new ArrayList<String>();
+    private volatile ArrayList<String> historyIDs = new ArrayList<String>();
     private volatile ArrayList<String> historyVals = new ArrayList<String>();
     private String historyVersion;
     private volatile boolean historyUpToDate = false;
@@ -25,6 +25,7 @@ public class AccountDataHandler {
     public void addToAccountValue(int val){
         this.accountValue += val;
     }
+    public void subFromAccountValue(int val){this.accountValue -= val;}
 
     public String getUsername() {
         //username getter
@@ -36,21 +37,21 @@ public class AccountDataHandler {
         this.username = username;
     }
 
-    public void addToHistory(String game, String val){
-        historyGames.add(0, game);
-        historyVals.add(0, val);
+    public void addToHistory(String tagID, String val){
+        historyIDs.add(0, tagID);
+        historyVals.add(0,  val);
     }
 
-    public void setHistoryGames(ArrayList<String> historyGames){
-        this.historyGames = historyGames;
+    public void setHistoryIDs(ArrayList<String> historyIDs){
+        this.historyIDs = historyIDs;
     }
 
     public void setHistoryVals(ArrayList<String> historyVals){
         this.historyVals = historyVals;
     }
 
-    public ArrayList<String> getHistoryGames(){
-        return historyGames;
+    public ArrayList<String> getHistoryIDs(){
+        return historyIDs;
     }
 
     public ArrayList<String> getHistoryVals(){

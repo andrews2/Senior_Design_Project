@@ -77,6 +77,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             case R.id.scan_page:
                 nextIntent = new Intent(this,ScanChipsActivity.class);
                 break;
+            case R.id.play_page:
+                nextIntent = new Intent(this, PlayActivity.class);
+                break;
             case R.id.settings_page:
                 nextIntent = new Intent(this,SettingsActivity.class);
                 break;

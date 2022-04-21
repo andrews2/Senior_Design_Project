@@ -16,6 +16,12 @@
             android:icon="@drawable/nfc_icon"/>
 
         <item
+            android:id="@+id/play_page"
+            android:title="Play"
+            android:icon="@drawable/play_icon"
+            />
+
+        <item
             android:id="@+id/settings_page"
             android:title="Settings"
             android:icon="@drawable/settings_icon"/>

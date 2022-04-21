@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PlayActivity"
+    android:id="@+id/drawer_layout"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select a chip to put in play:"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias=".05"
+        app:layout_constraintVertical_bias=".25"/>
+
+    <TextView
+        android:id="@+id/id_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chip ID:"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".305"
+        app:layout_constraintHorizontal_bias=".04"/>
+
+    <Spinner
+        android:id="@+id/tag_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/id_label"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".3"
+        app:layout_constraintHorizontal_bias=".05"/>
+
+    <Button
+        android:id="@+id/play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Put chip in play"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tag_spinner"
+        app:layout_constraintVertical_bias=".05"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

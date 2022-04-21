@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.Locale;
 
 import javax.crypto.SecretKey;
 
@@ -32,7 +31,7 @@ public class SignupFragment extends Fragment {
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
     private String BASE_URL = "https://vast-springs-82374.herokuapp.com/";
-    File historyGames;
+    File historyIDs;
     File historyVals;
     File historyVersion;
 
@@ -81,15 +80,16 @@ public class SignupFragment extends Fragment {
                             AccountDataHandler.getInstance().setAccountValue(0);
                             AccountDataHandler.getInstance().setUsername(username.getText().toString().toUpperCase());
                             AccountDataHandler.getInstance().setHistoryVersion(String.valueOf(0));
+                            AccountDataHandler.getInstance().setProfilePicture("none");
                             // create empty history files
                             try{
-                                historyGames = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_games.ser");
+                                historyIDs = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_ids.ser");
                                 historyVals = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
                                 historyVersion = new File(getActivity().getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
                                 //make blank history games file
-                                FileOutputStream fos = new FileOutputStream(historyGames);
+                                FileOutputStream fos = new FileOutputStream(historyIDs);
                                 ObjectOutputStream oos = new ObjectOutputStream(fos);
-                                oos.writeObject(AccountDataHandler.getInstance().getHistoryGames());
+                                oos.writeObject(AccountDataHandler.getInstance().getHistoryIDs());
                                 //make blank history vals file
                                 fos = new FileOutputStream(historyVals);
                                 oos = new ObjectOutputStream(fos);
@@ -100,6 +100,7 @@ public class SignupFragment extends Fragment {
                                 oos.writeObject(AccountDataHandler.getInstance().getHistoryVersion());
                                 AccountDataHandler.getInstance().setHistoryUpToDate(true);
                             } catch (Exception e){}
+
                             Intent nextIntent = new Intent(getActivity(), MainActivity.class);
                             getActivity().startActivity(nextIntent);
                         } else if(response.code() == 400){
