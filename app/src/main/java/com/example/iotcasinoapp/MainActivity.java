@@ -32,7 +32,6 @@ public class MainActivity extends BaseActivity {
     File historyVals;
     File historyVersion;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

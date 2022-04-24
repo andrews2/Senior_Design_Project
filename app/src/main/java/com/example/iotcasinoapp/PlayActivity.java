@@ -49,10 +49,8 @@ public class PlayActivity extends BaseActivity implements AdapterView.OnItemSele
                 File histIDs = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_ids.ser");
                 File histVals = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_vals.ser");
                 File histVersion = new File(getFilesDir(), AccountDataHandler.getInstance().getUsername() + "_version.ser");
-                new UpdateHistFiles(histIDs, histVals, histVersion);
-
+                new PutInPlayOnServer(chipID, histIDs, histVals, histVersion);
                 spinner.setSelection(0);
-                new PutInPlayOnServer(chipID);
             }
         });
     }
